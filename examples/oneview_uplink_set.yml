@@ -17,7 +17,7 @@
 - hosts: all
   vars:
     config: "{{ playbook_dir }}/oneview_config.json"
-    logical_interconnect_name: '<LIG>' # set the name of an existent logical interconnect to run this example
+    logical_interconnect_name: "LE-LIG" # set the name of an existent logical interconnect to run this example
     ethernet_networks:                     # set at least one ethernet network URI for this example
       - '/rest/ethernet-networks/21051893-e035-4c25-9dd0-8cd9cc953d25'
   tasks:
@@ -31,7 +31,7 @@
           # You can choose set the Logical Interconnect by logicalInterconnectUri or logicalInterconnectName
           logicalInterconnectName: "{{ logical_interconnect_name }}"                                    # option 1
           # logicalInterconnectUri: "/rest/logical-interconnects/461a9cef-beef-4916-8be1-926078ffb948"  # option 2
-          networkUris: "{{ ethernet_networks }}"
+          networkUris: []
           fcNetworkUris: []
           fcoeNetworkUris: []
           portConfigInfos: []

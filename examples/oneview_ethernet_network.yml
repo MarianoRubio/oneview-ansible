@@ -58,23 +58,23 @@
           name: '{{ network_name }}'
       delegate_to: localhost
 
-    - name: Ensure ethernet network has no scopes
-      oneview_ethernet_network:
-        config: "{{ config }}"
-        state: present
-        data:
-          name: "{{ network_name }}"
-          scopeUris: []
-      delegate_to: localhost
-
-    - name: Ensure Ethernet Network has two scopes
-      oneview_ethernet_network:
-        config: "{{ config }}"
-        state: present
-        data:
-          name: "{{ network_name }}"
-          scopeUris: "{{ network_scope_uris }}"
-      delegate_to: localhost
+#    - name: Ensure ethernet network has no scopes
+#      oneview_ethernet_network:
+#        config: "{{ config }}"
+#        state: present
+#        data:
+#          name: "{{ network_name }}"
+#          scopeUris: []
+#      delegate_to: localhost
+#
+#    - name: Ensure Ethernet Network has two scopes
+#      oneview_ethernet_network:
+#        config: "{{ config }}"
+#        state: present
+#        data:
+#          name: "{{ network_name }}"
+#          scopeUris: "{{ network_scope_uris }}"
+#      delegate_to: localhost
 
     - name: Rename the Ethernet Network to 'Updated Ethernet Network'
       oneview_ethernet_network:

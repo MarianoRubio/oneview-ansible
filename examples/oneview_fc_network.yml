@@ -17,11 +17,13 @@
 - hosts: all
   vars:
     config: "{{ playbook_dir }}/oneview_config.json"
+    contents: "{{lookup('file', config)}}"
     network_name: 'Ansible Test FC Network'
     network_scope_uris:
       - '/rest/scopes/d0324c4b-56c9-485b-b7dd-8f6218a4b5bb'
       - '/rest/scopes/9422ce05-dc39-4358-b723-c8c825eae412'
   tasks:
+
     - name: Create a Fibre Channel Network
       oneview_fc_network:
         config: "{{ config }}"
@@ -34,6 +36,10 @@
           autoLoginRedistribution: true
       delegate_to: localhost
       register: fc_network_1
+
+    - name: Display the api version present in config file
+      debug: 
+        var: contents.api_version
 
     - name: Do nothing with the Fibre Channel Network when no changes are provided
       oneview_fc_network:
@@ -65,6 +71,7 @@
         data:
           name: "{{ network_name }}"
           scopeUris: "{{ network_scope_uris }}"
+      when: contents.api_version >= 300 and contents.api_version <= 500
       delegate_to: localhost
 
     - name: Delete the Fibre Channel Network
