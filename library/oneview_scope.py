@@ -111,10 +111,10 @@ scope:
     type: dict
 '''
 
-from ansible.module_utils.oneview import OneViewModuleBase, OneViewModuleResourceNotFound
+from ansible.module_utils.oneview import OneViewModule, OneViewModuleResourceNotFound
 
 
-class ScopeModule(OneViewModuleBase):
+class ScopeModule(OneViewModule):
     MSG_CREATED = 'Scope created successfully.'
     MSG_UPDATED = 'Scope updated successfully.'
     MSG_DELETED = 'Scope deleted successfully.'
@@ -137,15 +137,15 @@ class ScopeModule(OneViewModuleBase):
         super(ScopeModule, self).__init__(additional_arg_spec=self.argument_spec,
                                           validate_etag_support=True)
 
-        self.resource_client = self.oneview_client.scopes
+        self.set_resource_object(self.oneview_client.scopes)
 
     def execute_module(self):
         resource = self.resource_client.get_by_name(self.data.get('name'))
 
         if self.state == 'present':
-            return self.resource_present(resource, 'scope')
+            return self.resource_present('scope')
         elif self.state == 'absent':
-            return self.resource_absent(resource)
+            return self.resource_absent()
         elif self.state == 'resource_assignments_updated':
             return self.__update_resource_assignments(resource)
 
@@ -157,18 +157,18 @@ class ScopeModule(OneViewModuleBase):
             scope = self.resource_client.update_resource_assignments(resource['uri'],
                                                                      self.data.get('resourceAssignments'))
         else:
-            add_resources = self.data.get('resourceAssignments').get('addedResourceUris') is not None
+            add_resources = self.data.get('resourceAssignments').get('addedResourceUris/-') is not None
             remove_resources = self.data.get('resourceAssignments').get('removedResourceUris') is not None
             if add_resources:
-                scope = self.resource_client.patch(resource['uri'], 'replace', '/addedResourceUris',
+                self.resource_client.patch(resource['uri'], 'replace', '/addedResourceUris/-',
                                                    self.data.get('resourceAssignments').get('addedResourceUris'))
             if remove_resources:
-                scope = self.resource_client.patch(resource['uri'], 'replace', '/removedResourceUris',
+                self.current_resource.patch(resource['uri'], 'replace', '/removedResourceUris',
                                                    self.data.get('resourceAssignments').get('removedResourceUris'))
             if not add_resources and not remove_resources:
                 return dict(changed=False,
                             msg=self.MSG_RESOURCE_ASSIGNMENTS_NOT_UPDATED,
-                            ansible_facts=dict(scope=resource))
+                            ansible_facts=dict(scope=self.current_resource.data))
 
         return dict(changed=True,
                     msg=self.MSG_RESOURCE_ASSIGNMENTS_UPDATED,
